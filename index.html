@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إذاعة القرآن الكريم - رمضان كريم</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-primary: #0a1128; /* أزرق ليلي */
+        --accent-gold: #ffd700; /* ذهبي لامع */
+        --glass-bg: rgba(20, 30, 60, 0.7); /* خلفية زجاجية داكنة */
+        --glass-border: rgba(255, 215, 0, 0.3); /* حدود ذهبية شفافة */
+        --text-light: #ffffff;
+        --text-dim: #cccccc;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Cairo", sans-serif;
+        background-color: var(--bg-primary);
+        color: var(--text-light);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        text-align: center;
+        overflow-x: hidden;
+      }
+
+      /* طبقة الخلفية المتغيرة */
+      #bg-layer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /* سيتم تعيين الصورة هنا بواسطة الجافاسكريبت */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: -2;
+        filter: brightness(0.4); /* تعتيم الخلفية قليلاً لسهولة القراءة */
+      }
+
+      /* تأثير النجوم اللامعة */
+      body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image:
+          radial-gradient(2px 2px at 20px 30px, #eee, rgba(0, 0, 0, 0)),
+          radial-gradient(2px 2px at 40px 70px, #fff, rgba(0, 0, 0, 0)),
+          radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0, 0, 0, 0)),
+          radial-gradient(2px 2px at 90px 40px, #fff, rgba(0, 0, 0, 0)),
+          radial-gradient(2px 2px at 130px 80px, #fff, rgba(0, 0, 0, 0));
+        background-repeat: repeat;
+        background-size: 200px 200px;
+        animation: twinkle 5s infinite linear;
+        opacity: 0.3;
+        z-index: -1;
+      }
+      @keyframes twinkle {
+        from {
+          background-position: 0 0;
+        }
+        to {
+          background-position: -200px 200px;
+        }
+      }
+
+      header {
+        padding: 60px 20px;
+        /* خلفية متدرجة خفيفة فوق الصورة */
+        background: linear-gradient(
+          to bottom,
+          rgba(10, 17, 40, 0.8),
+          transparent
+        );
+        border-bottom: 2px solid var(--accent-gold);
+        position: relative;
+      }
+
+      /* صورة الشيوخ الثابتة في الهيدر */
+      header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background-image: url("./quran image.png");
+        background-size: cover;
+        background-position: top center;
+        opacity: 0.25;
+        z-index: -1;
+        filter: grayscale(30%);
+      }
+
+      header h1 {
+        font-size: 2.5rem;
+        color: var(--accent-gold);
+        text-shadow: 0 0 15px var(--accent-gold);
+        margin: 0 0 10px;
+      }
+
+      /* حاوية الأقسام الرئيسية */
+      .container-glass {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        border-radius: 25px;
+        padding: 30px;
+        width: 90%;
+        max-width: 1000px;
+        margin: 30px auto;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      /* أزرار التبديل */
+      .nav-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+      }
+
+      .nav-btn {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-light);
+        border: 1px solid var(--glass-border);
+        padding: 12px 25px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: 0.3s;
+      }
+
+      .nav-btn:hover,
+      .nav-btn.active {
+        background: var(--accent-gold);
+        color: var(--bg-primary);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        border-color: var(--accent-gold);
+      }
+
+      /* شبكة مواقيت الصلاة */
+      .prayer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
+      }
+
+      .prayer-card {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 20px 10px;
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .prayer-card i {
+        color: var(--accent-gold);
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+      .prayer-name {
+        color: var(--text-dim);
+        font-size: 0.9rem;
+      }
+      .prayer-time {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: var(--text-light);
+        margin-top: 5px;
+      }
+
+      /* --- تصميم إذاعات الفانوس الجديد --- */
+      .radio-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 30px;
+        padding-top: 20px;
+      }
+
+      .radio-fanoos {
+        position: relative;
+        background: linear-gradient(
+          145deg,
+          rgba(255, 215, 0, 0.1),
+          rgba(10, 17, 40, 0.8)
+        );
+        border: 2px solid var(--accent-gold);
+        /* محاولة لمحاكاة شكل الفانوس باستخدام الحواف */
+        border-radius: 30px 30px 50% 50% / 30px 30px 60px 60px;
+        padding: 40px 15px 30px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        overflow: visible;
+      }
+
+      /* حلقة الفانوس العلوية */
+      /* .radio-fanoos::before {
+        content: "";
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30px;
+        height: 30px;
+        border: 3px solid var(--accent-gold);
+        border-radius: 50%;
+        background: transparent;
+        box-shadow: 0 0 10px var(--accent-gold);
+      }*/
+
+      .radio-fanoos:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+        background: linear-gradient(
+          145deg,
+          rgba(255, 215, 0, 0.2),
+          rgba(10, 17, 40, 0.9)
+        );
+      }
+
+      .radio-fanoos.active {
+        box-shadow:
+          0 0 35px rgba(255, 215, 0, 0.8),
+          inset 0 0 20px rgba(255, 215, 0, 0.2);
+        border-color: #fff;
+      }
+
+      .fanoos-icon-top {
+        font-size: 2rem;
+        color: var(--accent-gold);
+        margin-bottom: 15px;
+        filter: drop-shadow(0 0 5px var(--accent-gold));
+      }
+
+      .radio-img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin: 0 auto 12px;
+        display: block;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+        border: 2px solid rgba(255, 215, 0, 0.12);
+      }
+
+      .radio-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+        min-height: 50px; /* لتوحيد الارتفاع */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .radio-controls button {
+        border: none;
+        padding: 10px 15px;
+        border-radius: 50%;
+        font-size: 1.1rem;
+        cursor: pointer;
+        margin: 0 5px;
+        transition: 0.2s;
+      }
+      .btn-play {
+        background: var(--accent-gold);
+        color: var(--bg-primary);
+        box-shadow: 0 0 10px var(--accent-gold);
+      }
+      .btn-stop {
+        background: #e74c3c;
+        color: white;
+      }
+      .btn-play:hover {
+        transform: scale(1.1);
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* =========================================
+         ستايل الشخصيات المتحركة الجديدة
+      ========================================= */
+      #character-container {
+        position: fixed;
+        bottom: 20px; /* مسافة من الأسفل */
+        left: 20px; /* مسافة من اليسار */
+        z-index: 9999; /* رقم كبير عشان يظهر فوق كل العناصر */
+        opacity: 0; /* مخفي في البداية */
+        transform: translateY(50px); /* يبدأ من تحت شوية */
+        transition:
+          opacity 1s ease-in-out,
+          transform 1s ease-in-out; /* حركة ظهور ناعمة */
+        pointer-events: none; /* عشان لو جه فوق زرار تقدر تدوس على الزرار عادي */
+      }
+
+      /* كلاس الظهور */
+      #character-container.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      #character-img {
+        max-width: 180px; /* حجم الشخصية */
+        height: auto;
+        filter: drop-shadow(
+          0 5px 15px rgba(0, 0, 0, 0.3)
+        ); /* ضل خفيف للشخصية */
+        /* أنيميشن بسيط يخلي الشخصية تطوف */
+        animation: floatingChar 3s ease-in-out infinite;
+      }
+
+      @keyframes floatingChar {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      /* تعديل الحجم للموبايل */
+      @media (max-width: 768px) {
+        #character-img {
+          max-width: 130px;
+        }
+        #character-container {
+          bottom: 10px;
+          left: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="bg-layer"></div>
+
+    <header>
+      <h1>إذاعة القرآن الكريم</h1>
+      <p style="font-size: 1.2rem; color: var(--text-dim)">
+        تقبل الله منا ومنكم صالح الأعمال
+      </p>
+    </header>
+
+    <div class="container-glass">
+      <div class="nav-buttons">
+        <button class="nav-btn active" onclick="showSection('prayer')">
+          <i class="fas fa-mosque"></i> مواقيت الصلاة
+        </button>
+        <button class="nav-btn" onclick="showSection('radio')">
+          <i class="fas fa-broadcast-tower"></i> الإذاعات
+        </button>
+      </div>
+
+      <div id="prayer-section">
+        <h2 style="color: var(--accent-gold)">مواقيت الصلاة اليوم</h2>
+        <div class="prayer-grid" id="prayer-list">Loading...</div>
+      </div>
+
+      <div id="radio-section" class="hidden">
+        <h2 style="color: var(--accent-gold)">باقة الإذاعات القرآنية</h2>
+        <div class="radio-grid" id="radio-list">جاري تحميل الإذاعات...</div>
+      </div>
+    </div>
+
+    <div id="character-container">
+      <img id="character-img" src="" alt="شخصية رمضانية" />
+    </div>
+
+    <script>
+      // ==========================================
+      // 1. نظام الخلفيات العشوائية (Random Backgrounds)
+      // ==========================================
+      const cartoonBackgrounds = [
+        "https://via.placeholder.com/1920x1080/0a1128/ffd700?text=Ramadan+Cartoon+1",
+        "https://via.placeholder.com/1920x1080/141e30/ffd700?text=Ramadan+Cartoon+2",
+        "https://via.placeholder.com/1920x1080/243b55/ffd700?text=Ramadan+Cartoon+3",
+        "https://via.placeholder.com/1920x1080/0a1128/ffd700?text=Ramadan+Cartoon+4",
+        "https://via.placeholder.com/1920x1080/141e30/ffd700?text=Ramadan+Cartoon+5",
+        "https://via.placeholder.com/1920x1080/243b55/ffd700?text=Ramadan+Cartoon+6",
+        "https://via.placeholder.com/1920x1080/0a1128/ffd700?text=Ramadan+Cartoon+7",
+        "https://via.placeholder.com/1920x1080/141e30/ffd700?text=Ramadan+Cartoon+8",
+        "https://via.placeholder.com/1920x1080/243b55/ffd700?text=Ramadan+Cartoon+9",
+        "https://via.placeholder.com/1920x1080/0a1128/ffd700?text=Ramadan+Cartoon+10",
+      ];
+
+      function setRandomBackground() {
+        const randomIndex = Math.floor(
+          Math.random() * cartoonBackgrounds.length,
+        );
+        const selectedImage = cartoonBackgrounds[randomIndex];
+        document.getElementById("bg-layer").style.backgroundImage =
+          `url('${selectedImage}')`;
+      }
+      setRandomBackground();
+
+      // ==========================================
+      // 2. وظائف التبديل ومواقيت الصلاة (تم التعديل لـ 9 مواقيت)
+      // ==========================================
+      function showSection(sectionId) {
+        document.getElementById("prayer-section").classList.add("hidden");
+        document.getElementById("radio-section").classList.add("hidden");
+        document
+          .getElementById(sectionId + "-section")
+          .classList.remove("hidden");
+
+        const btns = document.querySelectorAll(".nav-btn");
+        btns.forEach((btn) => btn.classList.remove("active"));
+        event.currentTarget.classList.add("active");
+      }
+
+      const prayerIcons = {
+        Imsak: "clock",
+        Fajr: "sun",
+        Sunrise: "cloud-sun",
+        Dhuhr: "sun",
+        Asr: "cloud-sun",
+        Sunset: "cloud-moon",
+        Maghrib: "moon",
+        Isha: "cloud-moon",
+        Midnight: "star-and-crescent",
+      };
+      const arabicNames = {
+        Imsak: "الإمساك",
+        Fajr: "الفجر",
+        Sunrise: "الشروق",
+        Dhuhr: "الظهر",
+        Asr: "العصر",
+        Sunset: "الغروب",
+        Maghrib: "المغرب",
+        Isha: "العشاء",
+        Midnight: "منتصف الليل",
+      };
+
+      function formatTime(timeStr) {
+        let [h, m] = timeStr.split(":");
+        h = parseInt(h);
+        const suffix = h >= 12 ? "م" : "ص";
+        h = h % 12 || 12;
+        return `${h}:${m} ${suffix}`;
+      }
+
+      fetch(
+        "https://api.aladhan.com/v1/timingsByCity?city=cairo&country=egypt&method=8",
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          const timings = data.data.timings;
+          const list = document.getElementById("prayer-list");
+          list.innerHTML = "";
+          // قائمة بالـ 9 مواقيت المطلوبة
+          [
+            "Imsak",
+            "Fajr",
+            "Sunrise",
+            "Dhuhr",
+            "Asr",
+            "Sunset",
+            "Maghrib",
+            "Isha",
+            "Midnight",
+          ].forEach((prayer) => {
+            list.innerHTML += `
+                <div class="prayer-card">
+                    <i class="fas fa-${prayerIcons[prayer]}"></i>
+                    <span class="prayer-name">${arabicNames[prayer]}</span>
+                    <span class="prayer-time">${formatTime(timings[prayer])}</span>
+                </div>`;
+          });
+        });
+
+      // ==========================================
+      // 3. مشغل الإذاعات (تصميم الفانوس)
+      // ==========================================
+      let currentAudio = null;
+      let currentFanoos = null;
+
+      fetch("https://data-rosy.vercel.app/radio.json")
+        .then((res) => res.json())
+        .then((data) => {
+          const radioList = document.getElementById("radio-list");
+          radioList.innerHTML = "";
+          data.radios.reverse().forEach((radio) => {
+            const fanoos = document.createElement("div");
+            fanoos.className = "radio-fanoos";
+            const imgSrc =
+              radio.name === "إذاعة القرأن الكريم من القاهرة"
+                ? "/download.png"
+                : radio.img || "";
+            fanoos.innerHTML = `
+                  <img class="radio-img" src="${imgSrc}" alt="${radio.name}">
+                  <!-- <i class="fas fa-lightbulb fanoos-icon-top"></i> -->
+                  <div class="radio-name">${radio.name}</div>
+                  <div class="radio-controls">
+                    <button class="btn-play"><i class="fas fa-play"></i></button>
+                    <button class="btn-stop"><i class="fas fa-stop"></i></button>
+                  </div>
+                `;
+
+            const playBtn = fanoos.querySelector(".btn-play");
+            const stopBtn = fanoos.querySelector(".btn-stop");
+
+            playBtn.onclick = () => {
+              if (currentAudio) {
+                currentAudio.pause();
+                if (currentFanoos) currentFanoos.classList.remove("active");
+              }
+              currentAudio = new Audio(radio.url);
+              currentAudio.play();
+              currentFanoos = fanoos;
+              fanoos.classList.add("active");
+            };
+
+            stopBtn.onclick = () => {
+              if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+              }
+              fanoos.classList.remove("active");
+            };
+
+            radioList.appendChild(fanoos);
+          });
+        });
+
+      // ==========================================
+      // 4. نظام شخصيات فنانيس المتحركة (جديد)
+      // ==========================================
+      // تنويه هام: يجب استبدال الروابط التالية بروابط صورك الحقيقية للشخصيات
+      // (يفضل صور PNG بخلفية شفافة)
+      const fananeesUrls = [
+        "img/1.png",
+        "img/5.png",
+        "img/7.png",
+        "img/4.png",
+        "img/2.png",
+        "img/6.png",
+        "img/3.png",
+      ];
+
+      const charContainer = document.getElementById("character-container");
+      const charImg = document.getElementById("character-img");
+
+      // زمن الدورة: دقيقة واحدة (60000 ميلي ثانية)
+      // ملاحظة: للتجربة السريعة يمكنك تغيير هذا الرقم إلى 5000 (5 ثواني)
+      const CYCLE_TIME = 5000;
+
+      function cycleCharacter() {
+        // 1. إخفاء الشخصية الحالية
+        charContainer.classList.remove("show");
+
+        // 2. الانتظار لمدة دقيقة (وقت الاختفاء)
+        setTimeout(() => {
+          // 3. اختيار صورة عشوائية جديدة إذا كانت المصفوفة تحتوي على صور
+          if (fananeesUrls.length > 0) {
+            const randomIndex = Math.floor(Math.random() * fananeesUrls.length);
+            charImg.src = fananeesUrls[randomIndex];
+
+            // 4. إظهار الشخصية الجديدة
+            charContainer.classList.add("show");
+          }
+
+          // 5. الانتظار لمدة دقيقة (وقت الظهور) ثم إعادة الدورة
+          setTimeout(cycleCharacter, CYCLE_TIME);
+        }, CYCLE_TIME);
+      }
+
+      // بدء الدورة عند تحميل الصفحة (تظهر أول مرة بعد ثانية واحدة من فتح الموقع)
+      setTimeout(() => {
+        if (fananeesUrls.length > 0) {
+          const randomIndex = Math.floor(Math.random() * fananeesUrls.length);
+          charImg.src = fananeesUrls[randomIndex];
+          charContainer.classList.add("show");
+          // تبدأ دورة الاختفاء بعد انتهاء وقت الظهور الأول
+          setTimeout(cycleCharacter, CYCLE_TIME);
+        }
+      }, 1000);
+
+      // Fetch and display a random Quranic verse
+      fetch("https://api.alquran.cloud/v1/ayah/random/ar.asad")
+        .then((response) => response.json())
+        .then((data) => {
+          const verseText = data.data.text;
+          const verseElement = document.createElement("p");
+          verseElement.style.fontSize = "1.2rem";
+          verseElement.style.color = "var(--text-dim)";
+          verseElement.textContent = verseText;
+
+          const header = document.querySelector("header");
+          const existingParagraph = header.querySelector("p");
+          if (existingParagraph) {
+            existingParagraph.replaceWith(verseElement);
+          } else {
+            header.appendChild(verseElement);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching the verse:", error);
+        });
+    </script>
+  </body>
+</html>
